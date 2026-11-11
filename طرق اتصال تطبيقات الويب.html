@@ -1,0 +1,1112 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>طرق اتصال تطبيقات الويب</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Reem+Kufi:wght@500;600;700&display=swap">
+<style>
+/* Layout: lapis-and-gold glass deck. Circle stepper on top, one slide per concept,
+   every detail is followed by a live client (right) / server (left) scene. */
+:root{
+  --bg:#07122b; --bg-2:#0d2250;
+  --ink:#eaf1ff; --ink-2:#aebdda; --ink-3:#7589ae;
+  --glass:rgba(255,255,255,.07); --glass-2:rgba(255,255,255,.12);
+  --edge:rgba(255,255,255,.17); --edge-hi:rgba(255,255,255,.36);
+  --shadow:0 24px 60px -28px rgba(0,0,0,.75);
+  --client:#35e0cf; --server:#ffbf47;
+  --ok:#43e08f; --err:#ff6b81; --warn:#ffb347; --secure:#7fa6ff;
+  --on-accent:#04122a;
+  --blob1:rgba(53,224,207,.30); --blob2:rgba(255,191,71,.24); --blob3:rgba(96,118,255,.34);
+  --dots:rgba(255,255,255,.07);
+  --code-bg:rgba(3,10,28,.62); --code-ink:#e6efff;
+  --c-k:#5ff0e0; --c-v:#ffcf70; --c-g:#6df0a6; --c-r:#ff8497; --c-d:#8497c0;
+  --fd:'Reem Kufi','Tajawal',system-ui,sans-serif;
+  --fb:'IBM Plex Sans Arabic','Segoe UI',Tahoma,sans-serif;
+  --fm:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#e9f0fb; --bg-2:#d6e4f8;
+    --ink:#0c1a39; --ink-2:#3b4f78; --ink-3:#687b9f;
+    --glass:rgba(255,255,255,.58); --glass-2:rgba(255,255,255,.82);
+    --edge:rgba(12,26,57,.12); --edge-hi:rgba(255,255,255,.95);
+    --shadow:0 24px 50px -30px rgba(25,50,110,.45);
+    --client:#079c8f; --server:#c47400;
+    --ok:#119a56; --err:#d33a55; --warn:#c47400; --secure:#3a5fd6;
+    --blob1:rgba(53,224,207,.40); --blob2:rgba(255,191,71,.40); --blob3:rgba(96,118,255,.30);
+    --dots:rgba(12,26,57,.07);
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#e9f0fb; --bg-2:#d6e4f8;
+  --ink:#0c1a39; --ink-2:#3b4f78; --ink-3:#687b9f;
+  --glass:rgba(255,255,255,.58); --glass-2:rgba(255,255,255,.82);
+  --edge:rgba(12,26,57,.12); --edge-hi:rgba(255,255,255,.95);
+  --shadow:0 24px 50px -30px rgba(25,50,110,.45);
+  --client:#079c8f; --server:#c47400;
+  --ok:#119a56; --err:#d33a55; --warn:#c47400; --secure:#3a5fd6;
+  --blob1:rgba(53,224,207,.40); --blob2:rgba(255,191,71,.40); --blob3:rgba(96,118,255,.30);
+  --dots:rgba(12,26,57,.07);
+  color-scheme:light;
+}
+:root[data-theme="dark"]{ color-scheme:dark; }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; direction:rtl; background:var(--bg); color:var(--ink);
+  font-family:var(--fb); font-size:16px; line-height:1.8;
+  padding-block:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  min-height:100%; overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font-family:inherit;color:inherit}
+h1,h2,h3{font-family:var(--fd);text-wrap:balance;margin:0;line-height:1.35}
+p{margin:0}
+svg{display:block}
+:focus-visible{outline:3px solid var(--client);outline-offset:3px;border-radius:10px}
+
+/* ---------- background ---------- */
+.aurora{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  background:radial-gradient(120% 80% at 80% -10%,var(--bg-2),transparent 60%)}
+.aurora i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.9}
+.aurora i:nth-child(1){width:46vmax;height:46vmax;background:radial-gradient(circle,var(--blob1),transparent 65%);top:-12vmax;right:-10vmax;animation:drift 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){width:42vmax;height:42vmax;background:radial-gradient(circle,var(--blob2),transparent 65%);bottom:-14vmax;left:-8vmax;animation:drift 27s ease-in-out infinite alternate-reverse}
+.aurora i:nth-child(3){width:36vmax;height:36vmax;background:radial-gradient(circle,var(--blob3),transparent 65%);top:35%;left:30%;animation:drift 31s ease-in-out infinite alternate}
+.aurora::after{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--dots) 1.2px,transparent 1.4px);background-size:30px 30px;
+  -webkit-mask-image:linear-gradient(180deg,#000,transparent 85%);mask-image:linear-gradient(180deg,#000,transparent 85%)}
+@keyframes drift{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(6vmax,4vmax,0) scale(1.15)}}
+.app{position:relative;z-index:1}
+
+/* ---------- glass ---------- */
+.glass{position:relative;background:var(--glass);border:1px solid var(--edge);border-radius:26px;
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6);
+  box-shadow:var(--shadow),inset 0 1px 0 var(--edge-hi);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(340px circle at var(--mx,50%) var(--my,0%),color-mix(in srgb,var(--client) 20%,transparent),transparent 62%)}
+.glass:hover::before{opacity:1}
+.lift:hover{transform:translateY(-5px);border-color:var(--edge-hi)}
+
+/* ---------- header / stepper ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;margin:10px auto 0;max-width:1080px;padding:10px 16px 8px;border-radius:26px}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .lg{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--on-accent);background:linear-gradient(135deg,var(--client),var(--server))}
+.brand .lg svg{width:20px;height:20px}
+.brand b{font:600 1rem var(--fd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;color:var(--ink-3);font-size:.7rem;line-height:1.2}
+.tgl{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--edge);background:var(--glass-2);cursor:pointer;display:grid;place-items:center;transition:transform .3s,box-shadow .3s}
+.tgl:hover{transform:rotate(-18deg) scale(1.08);box-shadow:0 8px 20px -8px var(--server)}
+.tgl svg{width:19px;height:19px}
+.steps{display:flex;align-items:flex-start;padding:2px 0 0}
+.stp{flex:none;display:grid;justify-items:center;gap:4px;width:44px;background:none;border:0;padding:0;cursor:pointer;font:inherit}
+.circ{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font:700 1.05rem var(--fd);
+  background:var(--glass-2);border:1px solid var(--edge);transition:transform .35s cubic-bezier(.3,1.5,.5,1),box-shadow .3s,background .3s}
+.stp:hover .circ{transform:translateY(-3px) scale(1.1);box-shadow:0 10px 24px -8px var(--client)}
+.stp.done .circ{background:color-mix(in srgb,var(--client) 24%,transparent);border-color:var(--client)}
+.stp.on .circ{background:linear-gradient(135deg,var(--client),var(--server));color:var(--on-accent);border-color:transparent;transform:scale(1.2);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--client) 22%,transparent),0 14px 30px -10px var(--client)}
+.stp.on .circ::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--client);animation:ring 2s ease-out infinite}
+.stp.pop .circ{animation:pop .7s cubic-bezier(.3,1.7,.5,1)}
+@keyframes ring{from{transform:scale(.95);opacity:.9}to{transform:scale(1.75);opacity:0}}
+@keyframes pop{0%{transform:scale(1) rotate(0)}40%{transform:scale(1.55) rotate(-14deg)}100%{transform:scale(1.2) rotate(0)}}
+.lb{font-size:.7rem;line-height:1.25;color:var(--ink-3);white-space:nowrap;text-align:center;padding-top:5px}
+.stp.on .lb{color:var(--ink);font-weight:600}
+.conn{flex:1;min-width:6px;height:3px;margin-top:19px;border-radius:3px;background:var(--edge);overflow:hidden}
+.conn i{display:block;height:100%;width:0;background:linear-gradient(to left,var(--client),var(--server));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.conn.fill i{width:100%}
+@media (max-width:640px){.stp:not(.on) .lb{display:none}}
+
+/* ---------- deck ---------- */
+.deck{max-width:1080px;margin:18px auto 0;padding-bottom:120px}
+.slide{display:none}
+.slide.active{display:block;animation:slin .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes slin{from{opacity:0;transform:translateX(var(--dx,-40px)) scale(.985)}to{opacity:1;transform:none}}
+.slide.active .rv{animation:rise .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.stack{display:grid;gap:18px}
+.sec-h{display:flex;align-items:center;gap:14px;font-size:clamp(1.55rem,5vw,2.25rem);margin:6px 2px 4px}
+.sn{flex:none;width:clamp(42px,9vw,54px);aspect-ratio:1;border-radius:16px;display:grid;place-items:center;font:700 1.35rem var(--fd);color:var(--on-accent);
+  background:linear-gradient(135deg,var(--client),var(--server));box-shadow:0 12px 26px -10px var(--client);transform:rotate(-6deg)}
+.det{display:grid;gap:16px;align-items:start}
+@media (min-width:880px){.det{grid-template-columns:minmax(0,.82fr) minmax(0,1.38fr)}.det.flip{grid-template-columns:minmax(0,1.38fr) minmax(0,.82fr)}}
+.det>*{min-width:0}
+.txt{padding:22px 22px 24px}
+.txt .dn{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;font:700 .95rem var(--fd);margin-bottom:10px;
+  background:color-mix(in srgb,var(--client) 22%,transparent);border:1px solid var(--client)}
+.txt p{font-size:1.05rem}
+.txt p+p{margin-top:10px}
+.tc{color:var(--client);font-weight:700}.ts{color:var(--server);font-weight:700}
+.fg{margin:0;display:grid;gap:8px}
+.fg figcaption{font-size:.85rem;color:var(--ink-2);padding:0 8px;text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font:600 .8rem var(--fb);letter-spacing:.08em;color:var(--server);padding:5px 12px;border-radius:999px;border:1px solid color-mix(in srgb,var(--server) 50%,transparent);background:color-mix(in srgb,var(--server) 12%,transparent)}
+.nbtn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:999px;border:1px solid var(--edge);background:var(--glass-2);font:600 .95rem var(--fb);cursor:pointer;transition:transform .25s,box-shadow .25s,border-color .25s}
+.nbtn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 12px 26px -12px var(--client);border-color:var(--client)}
+.nbtn:disabled{opacity:.4;cursor:default}
+.nbtn svg{width:18px;height:18px}
+.nbtn.pri{background:linear-gradient(135deg,var(--client),var(--server));color:var(--on-accent);border-color:transparent}
+
+/* ---------- hero (slide 1) ---------- */
+.hero{padding:clamp(22px,4vw,40px);display:grid;gap:26px;overflow:hidden}
+@media (min-width:860px){.hero{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}}
+.hero h1{font-size:clamp(2.1rem,7vw,3.5rem);margin:14px 0 12px;background:linear-gradient(120deg,var(--ink) 30%,var(--client) 70%,var(--server));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .hint{color:var(--ink-2);margin-bottom:18px}
+.mflow{direction:ltr;display:flex;align-items:center}
+.mn{flex:none;width:88px;display:grid;justify-items:center;gap:6px;padding:12px 8px;border-radius:20px;background:var(--glass-2);border:1px solid var(--edge)}
+.mn svg{width:34px;height:34px}
+.mn span{font:600 .78rem var(--fb);direction:rtl}
+.mn.cl{box-shadow:inset 0 2px 0 var(--client);color:var(--client)}
+.mn.sv{box-shadow:inset 0 2px 0 var(--server);color:var(--server)}
+.mn span{color:var(--ink)}
+.mw{flex:1;position:relative;height:96px;min-width:60px}
+.mw::before,.mw::after{content:"";position:absolute;left:6px;right:6px;height:2px;opacity:.85}
+.mw::before{top:30%;background:repeating-linear-gradient(90deg,var(--client) 0 8px,transparent 8px 16px);animation:flowl 1s linear infinite}
+.mw::after{top:68%;background:repeating-linear-gradient(90deg,var(--server) 0 8px,transparent 8px 16px);animation:flowr 1s linear infinite}
+@keyframes flowl{to{background-position:-16px 0}}
+@keyframes flowr{to{background-position:16px 0}}
+.mw .dt{position:absolute;width:14px;height:14px;border-radius:50%;margin-top:-6px;opacity:0}
+.mw .rq{top:30%;background:var(--client);box-shadow:0 0 16px var(--client);animation:rq 2.8s ease-in-out infinite}
+.mw .rs{top:68%;background:var(--server);box-shadow:0 0 16px var(--server);animation:rs 2.8s ease-in-out 1.4s infinite}
+@keyframes rq{0%{left:calc(100% - 14px);opacity:0}12%{opacity:1}88%{opacity:1}100%{left:0;opacity:0}}
+@keyframes rs{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 14px);opacity:0}}
+.mw .mg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:4px 10px;border-radius:999px;font:600 .72rem var(--fm);background:var(--glass-2);border:1px solid var(--edge-hi);animation:glow 2.8s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--secure) 30%,transparent)}}
+
+.grid2{display:grid;gap:16px}
+@media (min-width:760px){.grid2{grid-template-columns:1fr 1fr}}
+.grid2>*{min-width:0}
+.cardp{padding:20px 20px 22px}
+.cardp h3{font-size:1.25rem;display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.cardp h3 .hi{flex:none;width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:color-mix(in srgb,var(--client) 20%,transparent);color:var(--client)}
+.cardp h3 .hi svg{width:20px;height:20px}
+.obj{display:grid;gap:12px}
+@media (min-width:640px){.obj{grid-template-columns:1fr 1fr}}
+.obj>*{min-width:0}
+.obj .glass{padding:18px 18px 20px;display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.obj .oi{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--on-accent);background:linear-gradient(135deg,var(--client),var(--server));transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.obj .glass:hover .oi{transform:rotate(-10deg) scale(1.15)}
+.obj .oi svg{width:24px;height:24px}
+.q{padding:22px 22px 24px;border-color:color-mix(in srgb,var(--server) 55%,var(--edge));background:linear-gradient(135deg,color-mix(in srgb,var(--server) 16%,transparent),var(--glass))}
+.q h3{color:var(--server);font-size:1.15rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.q h3 svg{width:24px;height:24px}
+.q p{font-size:1.15rem;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.cc{border:1px solid var(--edge);background:var(--glass-2);border-radius:999px;padding:6px 14px;font:500 .92rem var(--fb);cursor:pointer;transition:transform .25s,background .25s,border-color .25s}
+.cc:hover{transform:translateY(-3px);border-color:var(--client);background:color-mix(in srgb,var(--client) 18%,transparent)}
+.term{display:grid;gap:10px}
+.term div{padding:10px 14px;border-radius:14px;background:var(--glass-2);border:1px solid var(--edge)}
+.term b{font-weight:700}
+.bigidea{padding:22px 22px 24px;border-color:color-mix(in srgb,var(--client) 50%,var(--edge));background:linear-gradient(135deg,color-mix(in srgb,var(--client) 14%,transparent),var(--glass))}
+.bigidea h3{color:var(--client);font-size:1.1rem;margin-bottom:8px}
+.bigidea p{font-size:1.1rem;font-weight:600}
+.flowchips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px}
+.flowchips span{padding:5px 12px;border-radius:999px;background:var(--glass-2);border:1px solid var(--edge);font:600 .8rem var(--fm);transition:transform .25s}
+.flowchips span:hover{transform:scale(1.12) rotate(-3deg)}
+.flowchips svg{width:16px;height:16px;color:var(--ink-3)}
+
+/* ---------- scene (client/server player) ---------- */
+.scene{padding:16px;display:grid;gap:12px}
+.sc-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tab{display:inline-flex;align-items:center;gap:7px;padding:6px 14px;border-radius:999px;border:1px solid var(--edge);background:var(--glass-2);font:600 .85rem var(--fm);cursor:pointer;transition:transform .25s,background .25s,border-color .25s}
+.tab:hover{transform:translateY(-2px)}
+.tab[aria-selected="true"]{background:linear-gradient(135deg,var(--client),var(--server));color:var(--on-accent);border-color:transparent}
+.tab .tdot{width:8px;height:8px;border-radius:50%;background:var(--ink-3)}
+.tab .tdot.ok{background:var(--ok)}.tab .tdot.warn{background:var(--warn)}.tab .tdot.err{background:var(--err)}
+.tab[aria-selected="true"] .tdot{box-shadow:0 0 0 2px var(--on-accent)}
+.sc-stage{--H:176px;position:relative;display:grid;grid-template-columns:96px minmax(0,1fr) 96px;height:var(--H)}
+@media (min-width:560px){.sc-stage{grid-template-columns:128px minmax(0,1fr) 128px}}
+.sc-col{display:grid;min-width:0}
+.sc-col.clc{grid-template-rows:repeat(var(--rows),1fr)}
+.node{position:relative;min-width:0;border-radius:18px;padding:8px;background:var(--glass-2);border:1px solid var(--edge);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.node.cl{box-shadow:inset 0 2px 0 var(--client)}
+.node.sv{box-shadow:inset 0 2px 0 var(--server)}
+.node .nm{display:flex;align-items:center;gap:6px;font-size:.78rem;text-align:center;line-height:1.3}
+.node .nm .ic svg,.node.mini .ic svg{width:18px;height:18px}
+.node.cl .ic{color:var(--client)}.node.sv .ic{color:var(--server)}
+.node.mini{margin:4px 0;font-size:.74rem;text-align:center;line-height:1.3;gap:4px}
+.node.mini .ic svg{width:24px;height:24px}
+.node.hit{animation:hit .8s ease-out}
+.node.cl.hit{--hc:var(--client)}.node.sv.hit{--hc:var(--server)}
+@keyframes hit{0%{box-shadow:0 0 0 0 var(--hc)}45%{box-shadow:0 0 0 8px color-mix(in srgb,var(--hc) 25%,transparent),0 0 34px var(--hc)}100%{box-shadow:0 0 0 0 transparent}}
+.chip{min-height:22px;max-width:100%;padding:2px 9px;border-radius:999px;font-size:.68rem;line-height:1.6;background:var(--glass);border:1px solid var(--edge);text-align:center;transition:opacity .3s}
+.chip:empty{visibility:hidden}
+.screen{width:100%;border-radius:10px;overflow:hidden;border:1px solid var(--edge);background:color-mix(in srgb,var(--bg) 55%,transparent)}
+.screen .bar{display:flex;align-items:center;gap:3px;padding:4px 5px;background:var(--glass-2);direction:ltr}
+.screen .bar>i{flex:none;width:5px;height:5px;border-radius:50%;background:var(--ink-3)}
+.url{flex:1;min-width:0;display:flex;align-items:center;gap:3px;margin-left:3px;padding:2px 5px;border-radius:6px;font:500 .54rem/1.5 var(--fm);color:var(--ink-2);background:color-mix(in srgb,var(--ink-3) 18%,transparent);white-space:nowrap;overflow:hidden}
+.url span{overflow:hidden;text-overflow:ellipsis}
+.url svg{flex:none;width:9px;height:9px;color:var(--ok)}
+.url.sec{color:var(--ok)}.url.ins{color:var(--err)}
+.screen .bd{position:relative;height:46px;padding:7px;display:grid;gap:5px;align-content:start}
+.screen .bd b{display:block;height:6px;border-radius:3px;background:var(--edge);transition:background .4s}
+.screen .bd b:nth-child(1){width:55%}.screen .bd b:nth-child(2){width:90%}.screen .bd b:nth-child(3){width:72%}
+.screen .big{display:none;position:absolute;inset:0;place-items:center;font:700 1.25rem var(--fm)}
+.screen[data-state="loading"] .bd b{animation:shim 1s ease-in-out infinite}
+.screen[data-state="loading"] .bd b:nth-child(2){animation-delay:.15s}.screen[data-state="loading"] .bd b:nth-child(3){animation-delay:.3s}
+@keyframes shim{50%{opacity:.3}}
+.screen[data-state="ok"] .bd b:nth-child(1){background:var(--client)}
+.screen[data-state="ok"] .bd b:nth-child(2){background:color-mix(in srgb,var(--ink-3) 70%,transparent)}
+.screen[data-state="ok"] .bd b:nth-child(3){background:var(--server)}
+.screen[data-state="404"] .bd b,.screen[data-state="500"] .bd b{opacity:.12}
+.screen[data-state="404"] .big{display:grid;color:var(--warn)}
+.screen[data-state="500"] .big{display:grid;color:var(--err);animation:shake .5s}
+@keyframes shake{20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+.rack{width:100%;display:grid;gap:5px}
+.unit{height:25px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;direction:ltr;border:1px solid var(--edge);
+  background:linear-gradient(180deg,color-mix(in srgb,var(--ink) 14%,transparent),color-mix(in srgb,var(--ink) 4%,transparent))}
+.unit .sl{flex:1;height:3px;margin:0 8px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--edge-hi) 0 4px,transparent 4px 8px)}
+.led{width:7px;height:7px;border-radius:50%;background:var(--ink-3);transition:background .3s,box-shadow .3s}
+.sv[data-state="idle"] .led{background:var(--ok);box-shadow:0 0 6px var(--ok);opacity:.55}
+.sv[data-state="ok"] .led{background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.sv[data-state="busy"] .led{background:var(--warn);box-shadow:0 0 10px var(--warn);animation:blink .35s steps(2) infinite}
+.sv[data-state="busy"] .unit:nth-child(2) .led{animation-delay:.12s}.sv[data-state="busy"] .unit:nth-child(3) .led{animation-delay:.24s}
+.sv[data-state="err"] .led{background:var(--err);box-shadow:0 0 12px var(--err)}
+.sv[data-state="err"]{animation:shake .5s}
+@keyframes blink{50%{opacity:.2}}
+.sc-lane{position:relative;direction:ltr;min-width:0}
+.trk{position:absolute;left:8px;right:8px;height:2px;margin-top:-1px;opacity:.9}
+.trk.req{background:repeating-linear-gradient(90deg,var(--client) 0 7px,transparent 7px 14px);animation:flowl 1.1s linear infinite}
+.trk.res{background:repeating-linear-gradient(90deg,var(--server) 0 7px,transparent 7px 14px);animation:flowr 1.1s linear infinite}
+.trk.req::after,.trk.res::after{content:"";position:absolute;top:-4px;border-style:solid;border-color:transparent}
+.trk.req::after{left:-4px;border-width:5px 8px 5px 0;border-right-color:var(--client)}
+.trk.res::after{right:-4px;border-width:5px 0 5px 8px;border-left-color:var(--server)}
+.tag{position:absolute;left:50%;transform:translate(-50%,-135%);font-size:.66rem;font-weight:600;white-space:nowrap;direction:rtl;color:var(--client)}
+.tag.res{transform:translate(-50%,45%);color:var(--server)}
+.pkt{position:absolute;left:0;z-index:3;height:28px;margin-top:-14px;display:flex;align-items:center;gap:6px;padding:0 11px;border-radius:999px;white-space:nowrap;direction:rtl;
+  font:700 .72rem/1 var(--fb);color:var(--on-accent);background:linear-gradient(135deg,var(--client),#a6f7ee);
+  box-shadow:0 8px 22px -6px var(--client),inset 0 1px 0 rgba(255,255,255,.55)}
+.pkt.res{background:linear-gradient(135deg,var(--server),#ffe3a6);box-shadow:0 8px 22px -6px var(--server),inset 0 1px 0 rgba(255,255,255,.55)}
+.pkt.ok{background:linear-gradient(135deg,#27c777,#9cf2c4);box-shadow:0 8px 22px -6px #27c777,inset 0 1px 0 rgba(255,255,255,.55)}
+.pkt.warn{background:linear-gradient(135deg,#ff9f2e,#ffd08a);box-shadow:0 8px 22px -6px #ff9f2e,inset 0 1px 0 rgba(255,255,255,.55)}
+.pkt.err{color:#fff;background:linear-gradient(135deg,#e5324f,#ff8da0);box-shadow:0 8px 22px -6px #e5324f,inset 0 1px 0 rgba(255,255,255,.4)}
+.pkt.secure{color:#fff;background:linear-gradient(135deg,#4b6cf0,#9d7cff);box-shadow:0 8px 22px -6px #4b6cf0,inset 0 1px 0 rgba(255,255,255,.4)}
+.pkt svg{width:13px;height:13px}
+.pkt.sm{height:24px;margin-top:-12px;font-size:.66rem;padding:0 9px}
+.gate{position:absolute;z-index:1;left:50%;top:7%;bottom:7%;width:46px;margin-left:-23px;border-radius:16px;display:grid;place-items:center;font:700 .85rem var(--fm);letter-spacing:.08em;
+  background:var(--glass-2);border:1px solid var(--edge-hi);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:box-shadow .3s,transform .3s}
+.gate.pass{box-shadow:0 0 0 3px color-mix(in srgb,var(--secure) 55%,transparent),0 0 34px var(--secure);transform:scale(1.06)}
+.sc-spy{display:flex;align-items:center;justify-content:center;gap:10px;min-height:46px;flex-wrap:wrap}
+.spy-id{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;border:1px dashed var(--edge-hi);font-size:.78rem;color:var(--ink-2)}
+.spy-id svg{width:18px;height:18px}
+.say{padding:5px 12px;border-radius:12px;font-size:.8rem;font-weight:600;border:1px solid var(--edge);background:var(--glass-2);opacity:0;transform:translateY(6px);transition:opacity .4s,transform .4s}
+.say.on{opacity:1;transform:none}
+.say.bad{color:var(--err);border-color:var(--err);background:color-mix(in srgb,var(--err) 14%,transparent)}
+.say.ok{color:var(--ok);border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent)}
+.sc-rawwrap{display:grid;gap:5px}
+.rawlab{font-size:.72rem;color:var(--ink-3);font-weight:600}
+.raw{margin:0;direction:ltr;min-height:4.6em;padding:10px 14px;border-radius:14px;border:1px solid var(--edge);background:var(--code-bg);color:var(--code-ink);
+  font:500 .78rem/1.75 var(--fm);white-space:pre-wrap;overflow-wrap:anywhere;unicode-bidi:plaintext}
+.raw .k{color:var(--c-k);font-weight:600}.raw .v{color:var(--c-v);font-weight:600}.raw .g{color:var(--c-g);font-weight:600}.raw .r{color:var(--c-r);font-weight:600}.raw .d{color:var(--c-d);font-style:normal}
+.sc-cap{display:flex;gap:10px;align-items:flex-start;min-height:3.9em}
+.sc-cap .bdg{flex:none;font:600 .72rem var(--fm);padding:3px 10px;border-radius:999px;background:var(--glass-2);border:1px solid var(--edge);margin-top:2px;white-space:nowrap}
+.sc-cap .cap{font-size:.98rem;line-height:1.7}
+.sc-ctl{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.btns{display:flex;gap:6px}
+.cb{width:38px;height:38px;border-radius:50%;border:1px solid var(--edge);background:var(--glass-2);cursor:pointer;display:grid;place-items:center;transition:transform .25s,box-shadow .25s,border-color .25s}
+.cb:hover{transform:translateY(-3px);border-color:var(--client);box-shadow:0 8px 18px -8px var(--client)}
+.cb svg{width:18px;height:18px}
+.cb.pl{background:linear-gradient(135deg,var(--client),var(--server));color:var(--on-accent);border-color:transparent}
+.dots{display:flex;gap:6px;align-items:center}
+.dot{width:10px;height:10px;border-radius:999px;border:0;padding:0;background:var(--edge-hi);cursor:pointer;transition:width .35s cubic-bezier(.3,1.4,.5,1),background .3s;position:relative}
+.dot::before{content:"";position:absolute;inset:-9px -4px}
+.dot.seen{background:color-mix(in srgb,var(--client) 60%,transparent)}
+.dot.on{width:26px;background:linear-gradient(90deg,var(--client),var(--server))}
+
+/* ---------- tables as cards ---------- */
+.tbl{display:grid;gap:8px;margin-top:14px}
+.tr{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;text-align:start;width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--edge);background:var(--glass-2);cursor:pointer;
+  transition:transform .3s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .3s}
+.tr:hover{transform:translateX(-5px);border-color:var(--client)}
+.tr[aria-pressed="true"]{border-color:var(--client);box-shadow:0 0 0 2px color-mix(in srgb,var(--client) 35%,transparent),0 14px 30px -16px var(--client)}
+.tr .m{min-width:62px;text-align:center;padding:5px 10px;border-radius:12px;font:700 .95rem var(--fm);color:var(--on-accent);background:var(--client)}
+.tr .m.post{background:var(--server)}.tr .m.c200{background:var(--ok)}.tr .m.c404{background:var(--warn)}.tr .m.c500{background:var(--err);color:#fff}
+.tr .bd2{display:grid;gap:2px;min-width:0;font-size:.92rem;line-height:1.65}
+.tr .bd2 small{font-size:.78rem;color:var(--ink-2)}
+.tlab{font-size:.8rem;color:var(--ink-3);font-weight:600;margin-top:14px}
+
+/* ---------- small widgets ---------- */
+.addr{display:grid;gap:12px;margin-top:14px}
+.abar{direction:ltr;display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:var(--code-bg);color:var(--code-ink);font:500 .9rem var(--fm);border:1px solid var(--edge);overflow:hidden;white-space:nowrap}
+.abar svg{flex:none;width:18px;height:18px;transition:color .3s}
+.abar .pr{font-weight:700;transition:color .3s}
+.abar[data-p="https"] svg,.abar[data-p="https"] .pr{color:var(--c-g)}
+.abar[data-p="http"] svg,.abar[data-p="http"] .pr{color:var(--c-r)}
+.abar .hs{overflow:hidden;text-overflow:ellipsis}
+.verdict{font-size:.95rem;min-height:3.4em}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;padding:8px 10px;border-radius:12px;border:1px solid var(--edge);background:var(--glass-2);font:600 .85rem var(--fm);cursor:pointer;transition:background .25s,transform .25s}
+.seg button:hover{transform:translateY(-2px)}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,var(--client),var(--server));color:var(--on-accent);border-color:transparent}
+.think{padding:22px}
+.think h3{display:flex;align-items:center;gap:10px;font-size:1.2rem;color:var(--server);margin-bottom:8px}
+.think h3 svg{width:26px;height:26px}
+.think .ans{margin-top:14px;padding:14px 16px;border-radius:16px;background:color-mix(in srgb,var(--ok) 14%,transparent);border:1px solid var(--ok);animation:rise .5s both}
+.json{direction:ltr;margin:0;padding:16px 18px;border-radius:16px;border:1px solid var(--edge);background:var(--code-bg);color:var(--code-ink);font:500 .88rem/1.9 var(--fm);overflow-x:auto;text-align:left;unicode-bidi:plaintext}
+.json i{font-style:normal;border-radius:6px;padding:0 3px;transition:background .3s,color .3s,box-shadow .3s}
+.json[data-hl="o"] .o{background:color-mix(in srgb,var(--c-k) 30%,transparent);color:var(--c-k);box-shadow:0 0 14px color-mix(in srgb,var(--c-k) 50%,transparent)}
+.json[data-hl="a"] .a{background:color-mix(in srgb,var(--c-v) 30%,transparent);color:var(--c-v);box-shadow:0 0 14px color-mix(in srgb,var(--c-v) 50%,transparent)}
+.json[data-hl="s"] .s{background:color-mix(in srgb,var(--c-g) 30%,transparent);color:var(--c-g);box-shadow:0 0 14px color-mix(in srgb,var(--c-g) 50%,transparent)}
+.jnote{min-height:3.2em;margin-top:12px}
+
+/* ---------- quiz ---------- */
+.quiz{display:grid;gap:12px}
+.qc{padding:18px 18px 20px;display:grid;gap:12px}
+.qc.ok{border-color:var(--ok)}.qc.bad{border-color:var(--err)}
+.qt{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.ql{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;font:700 1.05rem var(--fd);background:color-mix(in srgb,var(--client) 22%,transparent);border:1px solid var(--client)}
+.qopts{display:flex;flex-wrap:wrap;gap:8px}
+.qo{padding:9px 18px;border-radius:14px;border:1px solid var(--edge);background:var(--glass-2);font:600 .95rem var(--fb);cursor:pointer;transition:transform .25s,border-color .25s,background .25s}
+.qo:hover:not(:disabled){transform:translateY(-3px);border-color:var(--client)}
+.qo:disabled{cursor:default}
+.qo.pick{border-width:2px}
+.qo.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 20%,transparent)}
+.qo.wrong{border-color:var(--err);background:color-mix(in srgb,var(--err) 20%,transparent)}
+.fb{padding:10px 14px;border-radius:14px;font-size:.93rem;background:var(--glass-2);border:1px solid var(--edge);animation:rise .45s both}
+.fb b{color:var(--client)}
+.score{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 20px}
+.score strong{font:700 1.5rem var(--fd)}
+.bar2{flex:1;min-width:140px;height:10px;border-radius:99px;background:var(--edge);overflow:hidden}
+.bar2 i{display:block;height:100%;width:0;background:linear-gradient(to left,var(--client),var(--server));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+
+/* ---------- dock ---------- */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:25;display:flex;justify-content:center;pointer-events:none;
+  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.dock-in{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:7px;border-radius:999px;max-width:100%;
+  background:var(--glass);border:1px solid var(--edge);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);box-shadow:var(--shadow),inset 0 1px 0 var(--edge-hi)}
+.cnt{min-width:72px;display:grid;justify-items:center;gap:5px;font:600 .85rem/1.2 var(--fm);color:var(--ink-2)}
+.pd{display:flex;gap:4px;align-items:center}
+.pd i{width:6px;height:6px;border-radius:50%;background:var(--edge-hi);transition:width .3s,background .3s}
+.pd i.seen{background:color-mix(in srgb,var(--client) 60%,transparent)}
+.pd i.on{width:16px;border-radius:99px;background:linear-gradient(90deg,var(--client),var(--server))}
+.part-off{display:none!important}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div class="app">
+  <header class="top glass">
+    <div class="top-row">
+      <div class="brand">
+        <span class="lg" id="lg"></span>
+        <div style="min-width:0"><small>الدرس 3-2</small><b>طرق اتصال تطبيقات الويب</b></div>
+      </div>
+      <button class="tgl" id="tgl" aria-label="تبديل الوضع الفاتح والداكن"></button>
+    </div>
+    <nav class="steps" id="steps" aria-label="شرائح الدرس"></nav>
+  </header>
+
+  <main class="deck" id="deck">
+
+    <!-- 1: intro -->
+    <section class="slide stack" data-t="مقدمة">
+      <div class="hero glass rv" style="--i:0">
+        <div>
+          <span class="eyebrow">تطبيقات الويب · 3-2</span>
+          <h1>طرق اتصال تطبيقات الويب</h1>
+          <p class="hint">اتبع الدوائر في الأعلى. بعد كل فكرة سترى مشهدًا يتحرك بين العميل والخادم.</p>
+          <button class="nbtn pri" data-go="2" id="startBtn"></button>
+        </div>
+        <div class="mflow" aria-hidden="true">
+          <div class="mn sv"><span id="hs"></span><span>الخادم</span></div>
+          <div class="mw"><i class="dt rq"></i><i class="dt rs"></i><span class="mg">HTTP</span></div>
+          <div class="mn cl"><span id="hc"></span><span>العميل</span></div>
+        </div>
+      </div>
+
+      <div class="rv" style="--i:1">
+        <h2 class="sec-h" style="margin-bottom:12px">أهداف التعلم</h2>
+        <div class="obj">
+          <div class="glass lift"><span class="oi" data-ic="swap"></span><p>اشرح نموذج العميل والخادم ودورة الطلب والاستجابة.</p></div>
+          <div class="glass lift"><span class="oi" data-ic="lock"></span><p>ميّز بين HTTP وHTTPS، واستخدم GET وPOST في سياقات مناسبة.</p></div>
+          <div class="glass lift"><span class="oi" data-ic="code"></span><p>فسّر رموز حالة HTTP الشائعة، واشرح دور API وJSON في تبادل البيانات.</p></div>
+          <div class="glass lift"><span class="oi" data-ic="plug"></span><p>صمّم طريقة اتصال مناسبة لمهمة في تطبيق ويب، وبرّر اختيارك.</p></div>
+        </div>
+      </div>
+
+      <div class="glass cardp rv" style="--i:2">
+        <p style="font-size:1.05rem">في الدرس 3-1 تعلمت أن الواجهة الأمامية والواجهة الخلفية تتعاونان لتنفيذ طلب المستخدم. في هذا الدرس ستتعلم كيف تنتقل الطلبات والاستجابات بين العميل والخادم.</p>
+        <p style="font-size:1.05rem;margin-top:12px">عندما تنقر على رابط أو تبدأ بحثًا، يطلب المتصفح غالبًا البيانات التي يحتاجها من خدمة على خادم عبر الشبكة. المتصفح هنا <b class="tc">عميل (client)</b> يرسل طلبًا، ويعيد <b class="ts">الخادم (server)</b> استجابة. وتحدد بروتوكولات مثل HTTP قواعد هذا التبادل. ويُعد نموذج الطلب والاستجابة أساسيًا في كثير من تطبيقات الويب، مع وجود وسائل اتصال أخرى عند الحاجة.</p>
+      </div>
+
+      <div class="glass q rv" style="--i:3">
+        <h3><span data-ic="q"></span>السؤال الرئيس</h3>
+        <p>كيف يتواصل العميل والخادم لتشغيل تطبيق الويب، وما القواعد والرسائل التي يستخدمانها؟</p>
+      </div>
+
+      <div class="grid2 rv" style="--i:4">
+        <div class="glass cardp lift">
+          <h3><span class="hi" data-ic="plug"></span>خريطة الدرس</h3>
+          <p style="font-weight:600;color:var(--client);margin-bottom:4px">الفكرة الأساسية:</p>
+          <p>تعمل تطبيقات الويب من خلال إرسال العميل للطلبات، وإرجاع الخادم للاستجابات، باستخدام بروتوكولات (HTTP/HTTPS) وغالبًا واجهات برمجة تتبادل البيانات بصيغ مثل JSON.</p>
+          <p style="font-weight:600;color:var(--client);margin:14px 0 8px">المفاهيم الأساسية:</p>
+          <div class="chips">
+            <button class="cc" data-go="2">العميل / الخادم</button>
+            <button class="cc" data-go="3">HTTP / HTTPS</button>
+            <button class="cc" data-go="4">طريقة طلب HTTP</button>
+            <button class="cc" data-go="4">رمز حالة HTTP</button>
+            <button class="cc" data-go="5">API / JSON</button>
+          </div>
+        </div>
+        <div class="glass cardp lift">
+          <h3><span class="hi" data-ic="bulb"></span>مصطلحات أساسية</h3>
+          <div class="term">
+            <div><b class="tc">العميل</b> – الجانب الذي يطلب البيانات أو المعالجة.</div>
+            <div><b class="ts">الخادم</b> – الجانب الذي يعالج الطلبات ويعيد الاستجابات.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2: client & server -->
+    <section class="slide stack" data-t="العميل والخادم">
+      <h2 class="sec-h rv"><span class="sn">1</span>العميل والخادم</h2>
+
+      <div class="det rv" style="--i:1">
+        <div class="glass txt lift"><span class="dn">1</span>
+          <p><b class="tc">العميل</b>: برنامج أو جهاز يرسل طلبًا إلى خدمة أخرى؛ ومن أمثلته متصفح الويب وتطبيق الهاتف.</p></div>
+        <figure class="fg"><div class="scene glass" data-sc="clients"></div>
+          <figcaption>نموذج مبسط: عدة عملاء يرسلون طلبات إلى خدمة على الخادم.</figcaption></figure>
+      </div>
+
+      <div class="det rv" style="--i:2">
+        <div class="glass txt lift"><span class="dn">2</span>
+          <p><b class="ts">الخادم</b>: الجانب الذي يستقبل الطلبات من العملاء، ويعالجها، ويعيد الاستجابات.</p></div>
+        <div class="scene glass" data-sc="server"></div>
+      </div>
+
+      <div class="det rv" style="--i:3">
+        <div class="glass txt lift"><span class="dn">3</span>
+          <p>تعتمد كثير من تطبيقات الويب على إرسال العميل طلبًا وإعادة الخادم استجابة.</p></div>
+        <figure class="fg"><div class="scene glass" data-sc="cycle"></div>
+          <figcaption>الشكل 3.2.1 – اتصال العميل بالخادم</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- 3: HTTP & HTTPS -->
+    <section class="slide stack" data-t="HTTP وHTTPS">
+      <h2 class="sec-h rv"><span class="sn">2</span>HTTP وHTTPS</h2>
+
+      <div class="det rv" style="--i:1">
+        <div class="glass txt lift"><span class="dn">1</span>
+          <p><b class="tc">HTTP</b> (بروتوكول نقل النص التشعبي): بروتوكول يستخدم لتبادل الرسائل بين عميل وخادم على الويب.</p></div>
+        <div class="scene glass" data-sc="http"></div>
+      </div>
+
+      <div class="det rv" style="--i:2">
+        <div class="glass txt lift"><span class="dn">2</span>
+          <p><b class="tc">HTTPS</b>: استخدام HTTP عبر اتصال TLS (Transport Layer Security) آمن. يساعد TLS على حماية سرية الاتصال وسلامته، وعلى مصادقة الخادم، بحيث لا يستطيع المتجسس قراءة المحتوى أو تعديله بسهولة أثناء النقل.</p></div>
+        <div class="scene glass" data-sc="https"></div>
+      </div>
+
+      <div class="det rv" style="--i:3">
+        <div class="glass txt lift"><span class="dn">3</span>
+          <p>المواقع التي تبدأ عناوينها بـ"https://" تستخدم اتصال HTTPS.</p>
+          <div class="addr">
+            <div class="abar" id="abar" data-p="https"><span id="alock"></span><span><span class="pr" id="apr">https</span>://school.example.eg</span></div>
+            <div class="seg"><button data-p="https" aria-pressed="true">https://</button><button data-p="http" aria-pressed="false">http://</button></div>
+            <p class="verdict" id="verdict"></p>
+          </div></div>
+        <div class="glass think">
+          <h3><span data-ic="bulb"></span>توقف وفكر</h3>
+          <p style="font-size:1.1rem;font-weight:600">لماذا يجب أن تستخدم صفحة تسجيل الدخول HTTPS بدلًا من HTTP العادي؟</p>
+          <button class="nbtn" id="thinkBtn" style="margin-top:14px">فكّر ثم اكشف الإجابة</button>
+          <div class="ans" id="thinkAns" hidden>صفحة تسجيل الدخول ترسل بيانات حساسة مثل كلمة المرور. HTTPS يحمي سرية الاتصال وسلامته، فلا يستطيع المتجسس قراءة هذه البيانات أو تعديلها بسهولة أثناء النقل. جرّب التبديل بين HTTP وHTTPS في المشهد أعلاه.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4: requests & responses -->
+    <section class="slide stack" data-t="الطلبات والاستجابات">
+      <h2 class="sec-h rv"><span class="sn">3</span>طلبات HTTP والاستجابات</h2>
+
+      <div class="det rv" style="--i:1">
+        <div class="glass txt">
+          <span class="dn">1</span>
+          <p>تتضمن الطلبات المرسلة من العميل إلى الخادم معلومات تسمى <b class="tc">طريقة طلب HTTP</b> توضح "نوع العملية المطلوبة".</p>
+          <div class="tbl" id="tbl-m">
+            <button class="tr" data-sc="method" data-v="GET"><span class="m">GET</span><span class="bd2"><span>يُستخدم عادةً لطلب مورد أو بيانات من الخادم</span><small>أمثلة: عرض صفحة ويب، استرجاع نتائج البحث.</small></span></button>
+            <button class="tr" data-sc="method" data-v="POST"><span class="m post">POST</span><span class="bd2"><span>يُستخدم عادةً لإرسال بيانات ليعالجها الخادم</span><small>أمثلة: إرسال معلومات تسجيل الدخول، إرسال محتويات نموذج.</small></span></button>
+          </div>
+        </div>
+        <figure class="fg"><div class="scene glass" data-sc="method"></div>
+          <figcaption>طلب HTTP واحد، واستجابة مطابقة واحدة.</figcaption></figure>
+      </div>
+
+      <div class="det rv" style="--i:2">
+        <div class="glass txt">
+          <span class="dn">2</span>
+          <p>تتضمن الاستجابات المرسلة من الخادم إلى العميل رقمًا يشير إلى نتيجة المعالجة. يسمى <b class="ts">رمز حالة HTTP</b>. فيما يلي بعض الأمثلة النموذجية.</p>
+          <div class="tbl" id="tbl-s">
+            <button class="tr" data-sc="status" data-v="200"><span class="m c200">200</span><span class="bd2"><span>نجاح (تمت معالجة الطلب بنجاح)</span></span></button>
+            <button class="tr" data-sc="status" data-v="404"><span class="m c404">404</span><span class="bd2"><span>المورد المطلوب غير موجود بهذا العنوان</span></span></button>
+            <button class="tr" data-sc="status" data-v="500"><span class="m c500">500</span><span class="bd2"><span>خطأ داخلي في الخادم منعه من إكمال الطلب؛ ولا يحدد الرمز وحده السبب التفصيلي</span></span></button>
+          </div>
+        </div>
+        <div class="scene glass" data-sc="status"></div>
+      </div>
+    </section>
+
+    <!-- 5: API -->
+    <section class="slide stack" data-t="واجهة API">
+      <h2 class="sec-h rv"><span class="sn">4</span>واجهة برمجة التطبيقات (API)</h2>
+
+      <div class="det rv" style="--i:1">
+        <div class="glass txt lift"><span class="dn">1</span>
+          <p><b class="tc">واجهة برمجة التطبيقات (API)</b>: مجموعة قواعد واضحة تسمح لبرنامج بطلب بيانات أو وظائف من برنامج آخر.</p></div>
+        <figure class="fg"><div class="glass cardp"><div class="mflow" aria-hidden="true">
+            <div class="mn sv"><span id="ps"></span><span>برنامج يقدّم</span></div>
+            <div class="mw"><i class="dt rq"></i><i class="dt rs"></i><span class="mg">API</span></div>
+            <div class="mn cl"><span id="pc"></span><span>برنامج يطلب</span></div></div></div>
+          <figcaption>واجهة برمجة التطبيقات (API) – (Application Programming Interface) واجهة أو عقد محدد للتواصل بين البرمجيات.</figcaption></figure>
+      </div>
+
+      <div class="det rv" style="--i:2">
+        <div class="glass txt lift"><span class="dn">2</span>
+          <p>قد ترسل الواجهة الأمامية طلبات إلى خدمة خلفية عبر API وتستقبل منها البيانات.</p></div>
+        <div class="scene glass" data-sc="api"></div>
+      </div>
+
+      <div class="det rv" style="--i:3">
+        <div class="glass txt lift"><span class="dn">3</span>
+          <p>قد تعيد API بيانات بصيغة <b class="ts">JSON (JavaScript Object Notation)</b>، وهي صيغة نصية شائعة لتمثيل وتبادل البيانات المهيكلة باستخدام كائنات ومصفوفات وقيم بسيطة، وتدعمها لغات وأدوات برمجية كثيرة.</p></div>
+        <div class="glass cardp">
+          <pre class="json" id="json" data-hl="o"><i class="o">{</i>
+  "name": <i class="s">"Salma"</i>,
+  "age": <i class="s">16</i>,
+  "skills": <i class="a">[</i><i class="s">"HTML"</i>, <i class="s">"JavaScript"</i><i class="a">]</i>,
+  "address": <i class="o">{</i> "city": <i class="s">"Cairo"</i> <i class="o">}</i>
+<i class="o">}</i></pre>
+          <div class="chips" style="margin-top:12px">
+            <button class="cc" data-h="o" aria-pressed="true">كائنات { }</button>
+            <button class="cc" data-h="a">مصفوفات [ ]</button>
+            <button class="cc" data-h="s">قيم بسيطة</button>
+          </div>
+          <p class="jnote" id="jnote"></p>
+        </div>
+      </div>
+
+      <div class="glass bigidea rv" style="--i:4">
+        <h3>الفكرة الرئيسة</h3>
+        <p>يتواصل تطبيق الويب كتبادل منظم: يطلب العميل ويستجيب الخادم، باستخدام بروتوكول (HTTP/HTTPS)، وطريقة طلب (GET/POST)، ورمز حالة، وغالبًا واجهة برمجة تطبيقات تعيد البيانات بصيغة JSON.</p>
+        <div class="flowchips" id="fchips"></div>
+      </div>
+    </section>
+
+    <!-- 6: solved example -->
+    <section class="slide stack" data-t="مثال محلول">
+      <h2 class="sec-h rv"><span class="sn">✎</span>مثال محلول</h2>
+
+      <div class="rv" style="--i:1">
+        <h3 style="font-size:1.2rem;margin:0 2px 12px">1. ضع علامة على كل عبارة (أ - د) بـ ✓ إذا كانت صحيحة أو × إذا كانت خاطئة.</h3>
+        <div class="quiz" id="qtf"></div>
+      </div>
+
+      <div class="rv" style="--i:2">
+        <h3 style="font-size:1.2rem;margin:6px 2px 12px">2. طابق كل وصف (1 - 3) مع المصطلح الأنسب من الخيارات أدناه (أ - ج).</h3>
+        <div class="glass cardp" style="margin-bottom:12px"><b>[الخيارات]</b> &nbsp; أ HTTP &nbsp; ب API &nbsp; ج HTTPS</div>
+        <div class="quiz" id="qmt"></div>
+      </div>
+
+      <div class="glass score rv" style="--i:3">
+        <div><span style="color:var(--ink-2);font-size:.85rem">النتيجة</span><br><strong id="scoreTxt">0 / 7</strong></div>
+        <div class="bar2"><i id="scoreBar"></i></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="nbtn" id="qReveal">اكشف الحلول</button>
+          <button class="nbtn" id="qReset">إعادة المحاولة</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="dock">
+    <div class="dock-in">
+      <button class="nbtn" id="prev"></button>
+      <span class="cnt" id="cnt">1 / 6</span>
+      <button class="nbtn pri" id="next"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function S(p,f){return '<svg viewBox="0 0 24 24" fill="'+(f?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+p+'</svg>';}
+var I={
+ browser:S('<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01"/>'),
+ phone:S('<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>'),
+ tablet:S('<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M11 18h2"/>'),
+ server:S('<rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"/>'),
+ lock:S('<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
+ unlock:S('<rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/>'),
+ eye:S('<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/>'),
+ play:S('<path d="M8 5.5v13l11-6.5z"/>',1),
+ pause:S('<path d="M8.5 5v14M15.5 5v14" stroke-width="3.2"/>'),
+ replay:S('<path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v4.5h4.5"/>'),
+ prev:S('<path d="M5 12h14M13 6l6 6-6 6"/>'),
+ next:S('<path d="M19 12H5M11 6l-6 6 6 6"/>'),
+ swap:S('<path d="M7 7h12l-3-3M17 17H5l3 3"/>'),
+ code:S('<path d="M8 8l-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/>'),
+ plug:S('<path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0zM12 17v4"/>'),
+ q:S('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7M12 17h.01"/>'),
+ bulb:S('<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>'),
+ moon:S('<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>'),
+ net:S('<circle cx="5" cy="12" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="19" cy="18" r="2.2"/><path d="M7 11l10-4M7 13l10 4"/>')
+};
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+
+/* ---------- raw-message helpers ---------- */
+function K(t){return '<b class="k">'+t+'</b>';}
+function V(t){return '<b class="v">'+t+'</b>';}
+function G(t){return '<b class="g">'+t+'</b>';}
+function R(t){return '<b class="r">'+t+'</b>';}
+function D(t){return '<i class="d">'+t+'</i>';}
+function P(dir,row,label,tone,icon){return {dir:dir,row:row||0,label:label,tone:tone,icon:icon};}
+
+/* ---------- scene definitions ---------- */
+var SC={};
+SC.clients={rows:3,H:240,
+ client:[{t:'متصفح الويب',i:'browser'},{t:'تطبيق الهاتف',i:'phone'},{t:'تطبيق على جهاز لوحي',i:'tablet'}],
+ server:{t:'الخادم'},intro:'عدة عملاء، وخدمة واحدة على الخادم.',
+ steps:[
+  {pkts:[P('req',0,'طلب')],cap:'متصفح الويب عميل: برنامج يرسل طلبًا إلى خدمة أخرى.',s:'يستقبل طلبًا'},
+  {pkts:[P('req',1,'طلب')],cap:'تطبيق الهاتف عميل أيضًا: جهاز يطلب خدمة من الخادم.',s:'يستقبل طلبين'},
+  {pkts:[P('req',2,'طلب')],cap:'وكل برنامج أو جهاز آخر يطلب الخدمة نفسها هو عميل كذلك.',s:'يستقبل 3 طلبات',ss0:'busy'},
+  {pkts:[P('res',0,'استجابة','ok'),P('res',1,'استجابة','ok'),P('res',2,'استجابة','ok')],cap:'يعالج الخادم الطلبات ويعيد استجابة لكل عميل.',ss:'ok',s1:'أعاد 3 استجابات'}
+ ]};
+SC.server={client:{t:'العميل',i:'browser'},server:{t:'الخادم'},url:'http://app.example.eg',
+ steps:[
+  {pkts:[P('req',0,'طلب')],cap:'الخادم يستقبل الطلبات من العملاء.',c:'أرسل طلبًا',cs0:'loading',s1:'وصله طلب',ss:'busy'},
+  {cap:'ثم يعالج الطلب: يجهّز البيانات أو ينفّذ العملية المطلوبة.',s:'يعالج الطلب…',ss0:'busy'},
+  {pkts:[P('res',0,'استجابة','ok')],cap:'ثم يعيد الاستجابة إلى العميل.',cs:'ok',ss:'ok',c1:'استلم الاستجابة',s1:'أعاد الاستجابة'}
+ ]};
+SC.cycle={client:{t:'العميل',i:'browser'},server:{t:'الخادم'},url:'http://app.example.eg/home',
+ steps:[
+  {pkts:[P('req',0,'أرني هذه الصفحة')],cap:'العميل (المتصفح أو تطبيق الهاتف) يرسل الطلب.',c:'يطلب صفحة',cs0:'loading'},
+  {cap:'الخادم (خادم الويب أو خادم التطبيقات) يعالج الطلب.',s:'يعالج الطلب…',ss0:'busy'},
+  {pkts:[P('res',0,'البيانات المطلوبة','ok')],cap:'الاستجابة: إعادة البيانات المطلوبة إلى العميل.',cs:'ok',ss:'ok',c1:'يعرض الصفحة',s1:'تم الرد'},
+  {cap:'يطلب العميل البيانات أو المعالجة، ويعالج الخادم الطلب ويعيد استجابة.'}
+ ]};
+SC.http={client:{t:'العميل',i:'browser'},server:{t:'الخادم'},url:'http://school.example.eg',raw:true,rawLabel:'رسالة HTTP كما تنتقل',
+ raw0:D('هنا تظهر الرسالة المتبادلة بين العميل والخادم'),
+ steps:[
+  {pkts:[P('req',0,'HTTP')],raw:K('GET')+' /lessons HTTP/1.1\n'+D('Host: school.example.eg'),cap:'HTTP يحدد شكل الرسالة التي يرسلها العميل إلى الخادم.',c:'يرسل رسالة HTTP',cs0:'loading'},
+  {pkts:[P('res',0,'HTTP','ok')],raw:G('HTTP/1.1 200 OK')+'\n'+D('Content-Type: text/html'),cap:'ويرد الخادم برسالة HTTP بالقواعد نفسها المتفق عليها.',cs:'ok',ss:'ok',s1:'رد برسالة HTTP'},
+  {raw:V('HyperText')+' '+V('Transfer')+' '+V('Protocol'),cap:'HTTP هو بروتوكول نقل النص التشعبي: قواعد لتبادل الرسائل بين عميل وخادم على الويب.'}
+ ]};
+SC.https={client:{t:'العميل',i:'browser'},server:{t:'الخادم'},spy:true,raw:true,rawLabel:'ما تحمله الشبكة',
+ raw0:D('اختر HTTP أو HTTPS ثم راقب ما يراه المتجسس'),
+ variants:{
+  HTTP:{label:'HTTP',url:'http://school.example.eg/login',steps:[
+   {pkts:[P('req',0,'بيانات الدخول','warn')],raw:K('POST')+' /login HTTP/1.1\n\nuser=salma&'+R('pass=1234'),cap:'في HTTP تنتقل الرسالة كنص مكشوف عبر الشبكة.',c:'يرسل كلمة المرور',spy:{t:'قرأ: pass=1234',tone:'bad'},cs0:'loading'},
+   {cap:'فيستطيع المتجسس قراءة المحتوى أو تعديله بسهولة أثناء النقل.',spy:{t:'يستطيع أيضًا تعديل الرسالة',tone:'bad'},s:'لا يضمن أن الرسالة لم تتغيّر',ss0:'busy'}
+  ]},
+  HTTPS:{label:'HTTPS',url:'https://school.example.eg/login',steps:[
+   {pkts:[P('req',0,'TLS','secure','lock'),P('res',0,'TLS','secure','lock')],raw:D('مصافحة TLS: اتفاق على مفاتيح التشفير'),cap:'يبدأ HTTPS باتصال TLS آمن، ويتحقق العميل من هوية الخادم.',c:'يتحقق من الخادم',s:'يثبت هويته',spy:{t:'يراقب الشبكة…',tone:''},c1:'الخادم موثوق',s1:'اتصال TLS جاهز'},
+   {pkts:[P('req',0,'مشفّر','secure','lock')],raw:K('POST')+' /login\n'+D('8f3a9c71e0b2d45a77c1e9f04b…'),cap:'تنتقل الرسالة مشفّرة، فلا يستطيع المتجسس قراءة المحتوى أو تعديله بسهولة.',c:'يرسل كلمة المرور',spy:{t:'يرى رموزًا مبهمة فقط',tone:'ok'},cs0:'loading',ss0:'busy'},
+   {pkts:[P('res',0,'مشفّر','secure','lock')],raw:D('c41e7a09d3…'),cap:'النتيجة: حماية سرية الاتصال وسلامته، ومصادقة الخادم.',cs:'ok',ss:'ok',c1:'تم الدخول بأمان',s1:'رد مشفّر'}
+  ]}
+ }};
+SC.method={client:{t:'العميل',i:'browser'},server:{t:'الخادم'},raw:true,rawLabel:'طلب HTTP واستجابته',
+ raw0:D('اختر GET أو POST من الجدول أو من الأزرار'),
+ variants:{
+  GET:{label:'GET',url:'http://shop.example.eg',steps:[
+   {pkts:[P('req',0,'GET')],raw:K('GET')+' /search?q=pyramids HTTP/1.1',cap:'GET: يطلب مورد أو بيانات من الخادم، مثل استرجاع نتائج البحث.',c:'يطلب نتائج البحث',cs0:'loading'},
+   {pkts:[P('res',0,'نتائج البحث','ok')],raw:G('HTTP/1.1 200 OK')+'\n'+D('[ نتائج البحث ]'),cap:'يعيد الخادم المورد المطلوب فتظهر الصفحة.',cs:'ok',ss:'ok',c1:'يعرض النتائج',s1:'أرسل النتائج'}
+  ]},
+  POST:{label:'POST',url:'http://shop.example.eg/login',steps:[
+   {pkts:[P('req',0,'POST','warn')],raw:K('POST')+' /login HTTP/1.1\n\nuser=salma&pass=••••',cap:'POST: يرسل بيانات ليعالجها الخادم، مثل معلومات تسجيل الدخول.',c:'يرسل نموذجًا',cs0:'loading'},
+   {cap:'الخادم يعالج البيانات المرسلة.',s:'يتحقق من البيانات…',ss0:'busy'},
+   {pkts:[P('res',0,'تمت المعالجة','ok')],raw:G('HTTP/1.1 200 OK')+'\n'+D('تمت معالجة الطلب'),cap:'ثم يعيد نتيجة المعالجة إلى العميل.',cs:'ok',ss:'ok',c1:'تم تسجيل الدخول',s1:'أعاد النتيجة'}
+  ]}
+ }};
+SC.status={client:{t:'العميل',i:'browser'},server:{t:'الخادم'},raw:true,rawLabel:'استجابة الخادم',
+ raw0:D('اختر رمز الحالة: 200 أو 404 أو 500'),
+ variants:{
+  '200':{label:'200',dot:'ok',url:'http://school.example.eg/lessons',steps:[
+   {pkts:[P('req',0,'GET /lessons')],raw:K('GET')+' /lessons HTTP/1.1',cap:'العميل يطلب مواردًا موجودة على الخادم.',c:'يطلب الدروس',cs0:'loading'},
+   {pkts:[P('res',0,'200','ok')],raw:G('HTTP/1.1 200 OK'),cap:'200: نجاح. تمت معالجة الطلب بنجاح.',cs:'ok',ss:'ok',c1:'نجح الطلب',s1:'عالج الطلب'}
+  ]},
+  '404':{label:'404',dot:'warn',url:'http://school.example.eg/lesson-99',steps:[
+   {pkts:[P('req',0,'GET /lesson-99')],raw:K('GET')+' /lesson-99 HTTP/1.1',cap:'العميل يطلب عنوانًا لا يوجد عليه شيء.',c:'يطلب صفحة',cs0:'loading'},
+   {cap:'الخادم يبحث عن المورد ولا يجده.',s:'لا يجد المورد',ss0:'busy'},
+   {pkts:[P('res',0,'404','warn')],raw:V('HTTP/1.1 404 Not Found'),cap:'404: المورد المطلوب غير موجود بهذا العنوان.',cs:'404',ss:'ok',c1:'الصفحة غير موجودة',s1:'الخادم يعمل'}
+  ]},
+  '500':{label:'500',dot:'err',url:'http://school.example.eg/report',steps:[
+   {pkts:[P('req',0,'GET /report')],raw:K('GET')+' /report HTTP/1.1',cap:'العميل يرسل طلبًا صحيحًا.',c:'يطلب تقريرًا',cs0:'loading'},
+   {cap:'لكن خللًا داخل الخادم يمنعه من إكمال الطلب.',s:'حدث خطأ داخلي',ss0:'busy'},
+   {pkts:[P('res',0,'500','err')],raw:R('HTTP/1.1 500 Internal Server Error'),cap:'500: خطأ داخلي في الخادم؛ ولا يحدد الرمز وحده السبب التفصيلي.',cs:'500',ss:'err',c1:'فشل الطلب',s1:'خطأ داخلي'}
+  ]}
+ }};
+SC.api={client:{t:'الواجهة الأمامية',i:'browser'},server:{t:'الخدمة الخلفية'},gate:'API',url:'https://app.example.eg',raw:true,rawLabel:'طلب API واستجابته',
+ raw0:D('الواجهة الأمامية تتحدث إلى الخدمة الخلفية عبر API'),
+ steps:[
+  {pkts:[P('req',0,'GET /api/students')],raw:K('GET')+' /api/students HTTP/1.1',cap:'الواجهة الأمامية ترسل طلبًا إلى الخدمة الخلفية عبر API.',c:'تطلب البيانات',cs0:'loading'},
+  {cap:'API قواعد واضحة تحدد كيف يطلب برنامج بيانات أو وظائف من برنامج آخر.',s:'يجهّز البيانات…',ss0:'busy'},
+  {pkts:[P('res',0,'JSON','ok')],raw:G('HTTP/1.1 200 OK')+'\n'+'[{ <b class="v">"name"</b>: "Salma", <b class="v">"age"</b>: 16 }]',cap:'تعيد الخدمة البيانات بصيغة JSON، فتعرضها الواجهة الأمامية.',cs:'ok',ss:'ok',c1:'تعرض البيانات',s1:'أعاد JSON'}
+ ]};
+
+/* ---------- scene engine ---------- */
+var scenes={};
+var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){
+  es.forEach(function(e){var s=e.target._sc;if(!s)return;
+    if(e.isIntersecting){if(!s.done&&!reduce)s.play();}else s.pause();});
+},{threshold:.45}):null;
+
+function Scene(el,id,def){
+  this.el=el;this.id=id;this.def=def;this.tok=0;this.ptok=0;this.cur=-1;this.playing=false;this.done=false;this.live=[];
+  this.vkeys=def.variants?Object.keys(def.variants):null;
+  this.v=this.vkeys?this.vkeys[0]:null;
+  this.rows=def.rows||1;
+  this.build();this.go(-1,false);
+  el._sc=this;if(io)io.observe(el);
+}
+Scene.prototype.cfg=function(){var d=this.def;if(!this.v)return d;var o={},k;for(k in d)o[k]=d[k];var vv=d.variants[this.v];for(k in vv)o[k]=vv[k];return o;};
+Scene.prototype.steps=function(){return this.cfg().steps;};
+Scene.prototype.q=function(s){return this.el.querySelector(s);};
+Scene.prototype.fy=function(r,res){return this.rows>1?((r+(res?0.72:0.30))/this.rows):(res?0.68:0.32);};
+Scene.prototype.build=function(){
+  var d=this.def,multi=this.rows>1,self=this,h='';
+  if(this.vkeys){
+    h+='<div class="sc-tabs" role="tablist">'+this.vkeys.map(function(k){var v=d.variants[k];
+      return '<button class="tab" role="tab" data-v="'+k+'"><span class="tdot '+(v.dot||'')+'"></span>'+v.label+'</button>';}).join('')+'</div>';
+  }
+  var cl;
+  if(multi){
+    cl=d.client.map(function(c,i){return '<div class="node cl mini" data-row="'+i+'"><span class="ic">'+I[c.i]+'</span><strong>'+c.t+'</strong></div>';}).join('');
+  }else{
+    cl='<div class="node cl"><div class="screen" data-state="idle"><div class="bar"><i></i><i></i><i></i><span class="url"></span></div><div class="bd"><b></b><b></b><b></b><em class="big"></em></div></div>'+
+       '<div class="nm"><span class="ic">'+I[d.client.i]+'</span><strong>'+d.client.t+'</strong></div><div class="chip st"></div></div>';
+  }
+  var units='';for(var u=0;u<(multi?5:3);u++)units+='<div class="unit"><i class="led"></i><i class="sl"></i><i class="led"></i></div>';
+  var sv='<div class="node sv" data-state="idle"><div class="rack">'+units+'</div><div class="nm"><span class="ic">'+I.server+'</span><strong>'+d.server.t+'</strong></div><div class="chip st"></div></div>';
+  var lane='';
+  for(var r=0;r<this.rows;r++){
+    lane+='<i class="trk req" style="top:'+(this.fy(r,0)*100)+'%"></i><i class="trk res" style="top:'+(this.fy(r,1)*100)+'%"></i>';
+  }
+  if(!multi){
+    lane+='<span class="tag req" style="top:'+(this.fy(0,0)*100)+'%">الطلب</span><span class="tag res" style="top:'+(this.fy(0,1)*100)+'%">الاستجابة</span>';
+  }
+  if(d.gate)lane+='<div class="gate">'+d.gate+'</div>';
+  h+='<div class="sc-stage" style="--H:'+(d.H||176)+'px;--rows:'+this.rows+'"><div class="sc-col clc">'+cl+'</div><div class="sc-lane">'+lane+'</div><div class="sc-col">'+sv+'</div></div>';
+  if(d.spy)h+='<div class="sc-spy"><span class="spy-id">'+I.eye+'متجسس على الشبكة</span><span class="say"></span></div>';
+  if(d.raw)h+='<div class="sc-rawwrap"><span class="rawlab">'+(d.rawLabel||'الرسالة')+'</span><pre class="raw" dir="auto"></pre></div>';
+  h+='<div class="sc-cap"><span class="bdg"></span><p class="cap"></p></div>';
+  h+='<div class="sc-ctl"><div class="btns"><button class="cb" data-a="prev" aria-label="الخطوة السابقة">'+I.prev+'</button><button class="cb pl" data-a="play" aria-label="تشغيل">'+I.play+'</button><button class="cb" data-a="next" aria-label="الخطوة التالية">'+I.next+'</button><button class="cb" data-a="re" aria-label="إعادة">'+I.replay+'</button></div><div class="dots"></div></div>';
+  this.el.innerHTML=h;
+  this.lane=this.q('.sc-lane');this.gate=this.q('.gate');
+  this.el.addEventListener('click',function(e){
+    var b=e.target.closest('[data-a],[data-v],[data-d]');if(!b||!self.el.contains(b))return;
+    if(b.dataset.a){var a=b.dataset.a,n=self.steps().length;
+      if(a==='play'){self.playing?self.pause():self.play();}
+      else if(a==='next'){self.pause();self.go(Math.min(self.cur+1,n-1));}
+      else if(a==='prev'){self.pause();self.go(Math.max(self.cur-1,0));}
+      else if(a==='re'){self.pause();self.go(-1,false);self.play();}
+    }else if(b.dataset.v){self.setVariant(b.dataset.v);}
+    else if(b.dataset.d){self.pause();self.go(+b.dataset.d);}
+  });
+  this.dots();
+};
+Scene.prototype.dots=function(){
+  var n=this.steps().length,h='';
+  for(var i=0;i<n;i++)h+='<button class="dot" data-d="'+i+'" aria-label="الخطوة '+(i+1)+'"></button>';
+  this.q('.dots').innerHTML=h;
+};
+Scene.prototype.paint=function(){
+  var self=this;
+  $$('.dot',this.el).forEach(function(d,i){d.classList.toggle('on',i===self.cur);d.classList.toggle('seen',i<self.cur);});
+  $$('.tab',this.el).forEach(function(t){t.setAttribute('aria-selected',String(t.dataset.v===self.v));});
+};
+Scene.prototype.ui=function(){
+  var b=this.q('[data-a="play"]');b.innerHTML=this.playing?I.pause:I.play;b.setAttribute('aria-label',this.playing?'إيقاف مؤقت':'تشغيل');
+};
+Scene.prototype.apply=function(S,st,arrival){
+  ['cap','c','s','spy','raw','url'].forEach(function(k){if(k in st)S[k]=st[k];});
+  if('cs0' in st)S.cs=st.cs0;if('ss0' in st)S.ss=st.ss0;
+  if(arrival){if('cs' in st)S.cs=st.cs;if('ss' in st)S.ss=st.ss;if('c1' in st)S.c=st.c1;if('s1' in st)S.s=st.s1;}
+};
+Scene.prototype.merge=function(i,startOnly){
+  var cfg=this.cfg(),st=cfg.steps,S={url:cfg.url||'',cs:'idle',ss:'idle'};
+  for(var k=0;k<=i&&k<st.length;k++)this.apply(S,st[k],!(k===i&&startOnly));
+  return S;
+};
+Scene.prototype.render=function(S){
+  var cfg=this.cfg(),n=cfg.steps.length;
+  this.q('.cap').textContent=S.cap||cfg.intro||'اضغط ▶ لمشاهدة الشرح.';
+  this.q('.bdg').textContent=this.cur<0?'ابدأ':(this.cur+1)+' / '+n;
+  var c=this.q('.cl .st');if(c)c.textContent=S.c||'';
+  this.q('.sv .st').textContent=S.s||'';
+  this.q('.sv').dataset.state=S.ss||'idle';
+  var sc=this.q('.screen');
+  if(sc){
+    sc.dataset.state=S.cs||'idle';
+    sc.querySelector('.big').textContent=(S.cs==='404'||S.cs==='500')?S.cs:'';
+    var u=sc.querySelector('.url'),url=S.url||'',sec=url.indexOf('https')===0,ins=url.indexOf('http:')===0;
+    u.className='url'+(sec?' sec':ins?' ins':'');
+    u.innerHTML=(sec?I.lock:'')+'<span>'+url+'</span>';
+  }
+  var r=this.q('.raw');if(r)r.innerHTML=S.raw||cfg.raw0||'';
+  var sp=this.q('.say');if(sp){sp.textContent=S.spy?S.spy.t:'';sp.className='say'+(S.spy&&S.spy.t?' on '+(S.spy.tone||''):'');}
+};
+Scene.prototype.wait=function(ms){return new Promise(function(r){setTimeout(r,ms);});};
+Scene.prototype.clearPkts=function(){this.live.forEach(function(el){try{el.getAnimations().forEach(function(a){a.cancel();});}catch(e){}el.remove();});this.live=[];};
+Scene.prototype.flash=function(el){if(!el)return;el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit');};
+Scene.prototype.node=function(k,start){
+  var toServer=(k.dir==='req')===start;
+  if(toServer)return this.q('.sv');
+  return this.rows>1?this.q('.cl[data-row="'+k.row+'"]'):this.q('.node.cl');
+};
+Scene.prototype.fly=function(pkts,t){
+  var self=this,W=this.lane.clientWidth,dur=reduce?10:1250;
+  return Promise.all(pkts.map(function(k,n){
+    var el=document.createElement('div');
+    el.className='pkt '+(k.tone||k.dir)+(self.rows>1?' sm':'');
+    el.innerHTML=(k.icon?I[k.icon]:'')+'<span>'+k.label+'</span>';
+    el.style.top=(self.fy(k.row,k.dir==='res')*100)+'%';
+    el.style.opacity='0';
+    self.lane.appendChild(el);self.live.push(el);
+    var w=el.offsetWidth,a=k.dir==='req'?W-w-4:4,b=k.dir==='req'?4:W-w-4,dl=(k.delay!=null?k.delay:n*170);
+    if(t===self.tok)self.flash(self.node(k,true));
+    var anim=el.animate([
+      {transform:'translateX('+a+'px) scale(.8)',opacity:0},
+      {transform:'translateX('+(a+(b-a)*.12)+'px) scale(1)',opacity:1,offset:.12},
+      {transform:'translateX('+(a+(b-a)*.88)+'px) scale(1)',opacity:1,offset:.88},
+      {transform:'translateX('+b+'px) scale(.9)',opacity:0}
+    ],{duration:dur,delay:dl,easing:'ease-in-out',fill:'both'});
+    if(self.gate)setTimeout(function(){if(t===self.tok){self.gate.classList.add('pass');setTimeout(function(){self.gate.classList.remove('pass');},520);}},dl+dur*.5);
+    return anim.finished.then(function(){if(t===self.tok)self.flash(self.node(k,false));}).catch(function(){}).then(function(){el.remove();});
+  }));
+};
+Scene.prototype.go=async function(i,animate){
+  if(animate===undefined)animate=true;
+  var t=++this.tok;this.clearPkts();this.cur=i;this.paint();
+  if(i<0){this.render(this.merge(-1,false));return;}
+  var st=this.steps()[i];
+  if(!animate||reduce){this.render(this.merge(i,false));return;}
+  this.render(this.merge(i,true));
+  if(st.pkts&&st.pkts.length)await this.fly(st.pkts,t);else await this.wait(900);
+  if(t!==this.tok)return;
+  this.render(this.merge(i,false));
+};
+Scene.prototype.play=async function(){
+  if(this.playing)return;
+  var pt=++this.ptok,steps=this.steps(),n=steps.length;
+  this.playing=true;this.done=false;this.ui();
+  var i=this.cur>=n-1?0:this.cur+1;
+  while(i<n){
+    await this.go(i);if(pt!==this.ptok)return;
+    await this.wait(1100+(steps[i].cap||'').length*16);if(pt!==this.ptok)return;
+    i++;
+  }
+  this.playing=false;this.done=true;this.ui();
+};
+Scene.prototype.pause=function(){this.ptok++;this.playing=false;this.ui();};
+Scene.prototype.setVariant=function(v){
+  if(!this.def.variants||!this.def.variants[v])return;
+  this.pause();this.v=v;this.cur=-1;this.done=false;this.dots();this.go(-1,false);
+  if(this.onv)this.onv(v);
+  if(!reduce)this.play();else this.go(0,false);
+};
+
+$$('[data-sc]').forEach(function(el){
+  if(!SC[el.dataset.sc]||el.classList.contains('tr'))return;
+  scenes[el.dataset.sc]=new Scene(el,el.dataset.sc,SC[el.dataset.sc]);
+});
+/* table rows drive the scene variants */
+function syncRows(id){
+  var sc=scenes[id];
+  $$('.tr[data-sc="'+id+'"]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===sc.v));});
+}
+['method','status'].forEach(function(id){
+  var sc=scenes[id];sc.onv=function(){syncRows(id);};syncRows(id);
+});
+$$('.tr').forEach(function(b){
+  b.addEventListener('click',function(){
+    var sc=scenes[b.dataset.sc];
+    if(sc.v!==b.dataset.v)sc.setVariant(b.dataset.v);else sc.pause(),sc.go(-1,false),sc.play();
+    sc.el.scrollIntoView({block:'nearest',behavior:reduce?'auto':'smooth'});
+  });
+});
+
+/* ---------- static icons ---------- */
+$$('[data-ic]').forEach(function(e){e.innerHTML=I[e.dataset.ic];});
+$('#lg').innerHTML=I.net;
+$('#hs').innerHTML=I.server;$('#hc').innerHTML=I.browser;
+$('#ps').innerHTML=I.server;$('#pc').innerHTML=I.browser;
+$('#tgl').innerHTML=I.moon;
+$('#prev').innerHTML=I.prev+'السابق';
+$('#next').innerHTML='التالي'+I.next;
+$('#startBtn').innerHTML='ابدأ الدرس'+I.next;
+
+/* ---------- deck + stepper ---------- */
+var slides=$$('.slide'),N=slides.length,cur=-1,part=0,stepsEl=$('#steps'),deck=$('#deck');
+/* every block of a slide (except its heading) is one part, shown alone */
+var parts=slides.map(function(s){
+  var a=$$(':scope > .rv',s).filter(function(e){return !e.classList.contains('sec-h');});
+  a.forEach(function(e){e.classList.add('part');e.style.setProperty('--i',1);});
+  return a;
+});
+(function(){
+  var h='';
+  slides.forEach(function(s,i){
+    h+='<button class="stp" data-i="'+i+'" aria-label="'+s.dataset.t+'"><span class="circ">'+(i+1)+'</span><span class="lb">'+s.dataset.t+'</span></button>';
+    if(i<N-1)h+='<span class="conn"><i></i></span>';
+  });
+  stepsEl.innerHTML=h;
+})();
+function show(n,p){
+  n=Math.max(0,Math.min(N-1,n));
+  p=Math.max(0,Math.min(parts[n].length-1,p||0));
+  if(n===cur&&p===part)return;
+  var prev=cur,same=n===cur;cur=n;part=p;
+  if(!same)deck.style.setProperty('--dx',(n>prev?-44:44)+'px');
+  slides.forEach(function(s,i){s.classList.toggle('active',i===n);});
+  parts[n].forEach(function(e,i){e.classList.toggle('part-off',i!==p);});
+  $$('.stp',stepsEl).forEach(function(b,i){
+    b.classList.toggle('on',i===n);b.classList.toggle('done',i<n);
+    if(!same){b.classList.remove('pop');if(i===n){void b.offsetWidth;b.classList.add('pop');}}
+    if(i===n)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
+  });
+  $$('.conn',stepsEl).forEach(function(c,i){c.classList.toggle('fill',i<n);});
+  var last=parts[n].length-1;
+  $('#cnt').innerHTML='<b>'+(n+1)+' / '+N+'</b><span class="pd">'+parts[n].map(function(_,i){return '<i class="'+(i===p?'on':i<p?'seen':'')+'"></i>';}).join('')+'</span>';
+  $('#prev').disabled=n===0&&p===0;
+  $('#next').disabled=n===N-1&&p===last;
+  $('#next').innerHTML=(p===last&&n<N-1?'الشريحة التالية':'التالي')+I.next;
+  window.scrollTo(0,0);
+  try{var h='#s'+(n+1)+(p?'p'+(p+1):'');if(location.hash!==h)history.replaceState(null,'',h);}catch(e){}
+}
+function nav(d){
+  if(d>0){if(part<parts[cur].length-1)show(cur,part+1);else if(cur<N-1)show(cur+1,0);}
+  else{if(part>0)show(cur,part-1);else if(cur>0)show(cur-1,parts[cur-1].length-1);}
+}
+stepsEl.addEventListener('click',function(e){var b=e.target.closest('.stp');if(b)show(+b.dataset.i,0);});
+$('#prev').addEventListener('click',function(){nav(-1);});
+$('#next').addEventListener('click',function(){nav(1);});
+document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)show(+b.dataset.go-1,0);});
+document.addEventListener('keydown',function(e){
+  if(e.target.closest&&e.target.closest('input,textarea,select'))return;
+  if(e.key==='ArrowLeft')nav(1);else if(e.key==='ArrowRight')nav(-1);
+});
+var tx=0,ty=0;
+deck.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+deck.addEventListener('touchend',function(e){
+  if(e.target.closest&&e.target.closest('.json,.raw'))return;
+  var dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>80&&Math.abs(dx)>Math.abs(dy)*2.2)nav(dx>0?1:-1);
+},{passive:true});
+function goHash(){var m=/^#s([1-6])(?:p(\d+))?$/.exec(location.hash);if(m)show(+m[1]-1,m[2]?+m[2]-1:0);else show(0,0);}
+window.addEventListener('hashchange',goHash);
+
+/* ---------- theme ---------- */
+$('#tgl').addEventListener('click',function(){
+  var r=document.documentElement,d=r.dataset.theme;
+  if(!d)d=(window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches)?'light':'dark';
+  r.dataset.theme=d==='dark'?'light':'dark';
+});
+
+/* ---------- pointer glow on glass ---------- */
+document.addEventListener('pointermove',function(e){
+  var g=e.target.closest&&e.target.closest('.glass');if(!g)return;
+  var r=g.getBoundingClientRect();
+  g.style.setProperty('--mx',(e.clientX-r.left)+'px');g.style.setProperty('--my',(e.clientY-r.top)+'px');
+},{passive:true});
+
+/* ---------- address bar demo ---------- */
+var AV={
+ https:'العنوان يبدأ بـ"https://" فالموقع يستخدم اتصال HTTPS، أي HTTP عبر TLS.',
+ http:'العنوان يبدأ بـ"http://" فالاتصال بلا TLS، فتنتقل الرسائل دون حماية.'
+};
+function setAddr(p){
+  $('#abar').dataset.p=p;$('#apr').textContent=p;$('#alock').innerHTML=p==='https'?I.lock:I.unlock;
+  $('#verdict').textContent=AV[p];
+  $$('.seg button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.p===p));});
+}
+$$('.seg button').forEach(function(b){b.addEventListener('click',function(){setAddr(b.dataset.p);});});
+setAddr('https');
+$('#thinkBtn').addEventListener('click',function(){
+  var a=$('#thinkAns');a.hidden=!a.hidden;this.textContent=a.hidden?'فكّر ثم اكشف الإجابة':'أخفِ الإجابة';
+});
+
+/* ---------- JSON lab ---------- */
+var JN={
+ o:'كائنات: مجموعات من أزواج اسم وقيمة بين { }، وقد يوجد كائن داخل كائن.',
+ a:'مصفوفات: قوائم مرتبة من القيم بين [ ].',
+ s:'قيم بسيطة: نصوص وأرقام مثل "Salma" و16.'
+};
+function setJ(h){
+  $('#json').dataset.hl=h;$('#jnote').textContent=JN[h];
+  $$('[data-h]').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.h===h));});
+}
+$$('[data-h]').forEach(function(b){
+  b.addEventListener('click',function(){setJ(b.dataset.h);});
+  b.addEventListener('mouseenter',function(){setJ(b.dataset.h);});
+});
+setJ('o');
+
+/* ---------- flow chips ---------- */
+$('#fchips').innerHTML=['العميل يطلب','HTTP/HTTPS','GET/POST','رمز حالة','API','JSON'].map(function(t){return '<span>'+t+'</span>';}).join('<span style="border:0;background:none;padding:0;display:inline-flex">'+I.next+'</span>');
+
+/* ---------- quiz ---------- */
+var TF=[
+ {l:'أ',t:'العميل هو الجانب الذي يطلب البيانات أو المعالجة من الخادم، والخادم هو الجانب الذي يعيد الاستجابة.',a:true,f:'وصف صحيح لأدوار العميل والخادم. لذلك ✓.'},
+ {l:'ب',t:'HTTPS هو استخدام HTTP عبر اتصال محمي بـTLS.',a:true,f:'يستخدم HTTPS بروتوكول HTTP عبر اتصال محمي بـTLS. لذلك ✓.'},
+ {l:'ج',t:'أسلوب GET مخصص لإرسال البيانات إلى الخادم.',a:false,f:'يُستخدم GET عادةً لطلب مورد أو بيانات، ويُستخدم POST عادةً لإرسال بيانات إلى الخادم لمعالجتها؛ فالعبارة تعكس الاستخدام المعتاد. لذلك ×.'},
+ {l:'د',t:'رمز حالة HTTP 404 يشير إلى أن المورد المطلوب غير موجود.',a:true,f:'رمز 404 يشير إلى أن المورد المطلوب غير موجود (وقد تكون صفحة مفقودة مثالًا على ذلك). لذلك ✓.'}
+];
+var OPT=[['HTTP','أ'],['API','ب'],['HTTPS','ج']];
+var MT=[
+ {l:'1',t:'بروتوكول اتصال لتبادل البيانات بين متصفحات الويب والخوادم',a:'HTTP',f:'HTTP بروتوكول لتبادل الرسائل والبيانات بين متصفحات الويب والخوادم.'},
+ {l:'2',t:'واجهة أو مجموعة قواعد محددة تتيح لبرنامج طلب بيانات أو وظائف من برنامج أو خدمة أخرى',a:'API',f:'API واجهة أو مجموعة قواعد محددة تتيح لبرنامج طلب بيانات أو وظائف من برنامج آخر.'},
+ {l:'3',t:'بروتوكول اتصال يضيف تشفيرًا إلى HTTP',a:'HTTPS',f:'HTTPS يستخدم HTTP عبر اتصال TLS آمن، فيضيف التشفير إلى HTTP.'}
+];
+var total=TF.length+MT.length,state={};
+function updScore(){
+  var c=0,k;for(k in state)if(state[k]===true)c++;
+  $('#scoreTxt').textContent=c+' / '+total;$('#scoreBar').style.width=(c/total*100)+'%';
+}
+function buildQuiz(){
+  state={};
+  $('#qtf').innerHTML=TF.map(function(q,i){
+    return '<div class="glass qc" id="tf'+i+'"><div class="qt"><span class="ql">'+q.l+'</span><p>'+q.t+'</p></div><div class="qopts"><button class="qo" data-q="tf" data-i="'+i+'" data-v="true">✓ صحيحة</button><button class="qo" data-q="tf" data-i="'+i+'" data-v="false">× خاطئة</button></div><div class="slot"></div></div>';
+  }).join('');
+  $('#qmt').innerHTML=MT.map(function(q,i){
+    return '<div class="glass qc" id="mt'+i+'"><div class="qt"><span class="ql">'+q.l+'</span><p>'+q.t+'</p></div><div class="qopts">'+OPT.map(function(o){return '<button class="qo" data-q="mt" data-i="'+i+'" data-v="'+o[0]+'">'+o[1]+' — '+o[0]+'</button>';}).join('')+'</div><div class="slot"></div></div>';
+  }).join('');
+  updScore();
+}
+function settle(kind,i,val,reveal){
+  var q=kind==='tf'?TF[i]:MT[i],card=$('#'+kind+i),ans=kind==='tf'?String(q.a):q.a,ok=reveal?null:(String(val)===ans);
+  $$('.qo',card).forEach(function(b){
+    b.disabled=true;
+    if(b.dataset.v===ans)b.classList.add('right');
+    if(!reveal&&b.dataset.v===String(val)){b.classList.add('pick');if(!ok)b.classList.add('wrong');}
+  });
+  if(!reveal){card.classList.add(ok?'ok':'bad');state[kind+i]=ok;}else if(!(kind+i in state))state[kind+i]='shown';
+  $('.slot',card).innerHTML='<div class="fb"><b>الحل:</b> '+q.f+'</div>';
+  updScore();
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('.qo');if(!b||b.disabled)return;
+  settle(b.dataset.q,+b.dataset.i,b.dataset.v,false);
+});
+$('#qReset').addEventListener('click',buildQuiz);
+$('#qReveal').addEventListener('click',function(){
+  TF.forEach(function(q,i){if(!(('tf'+i) in state))settle('tf',i,null,true);});
+  MT.forEach(function(q,i){if(!(('mt'+i) in state))settle('mt',i,null,true);});
+});
+buildQuiz();
+
+goHash();
+})();
+</script>
+
+</body></html>
